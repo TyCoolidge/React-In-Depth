@@ -1,4 +1,4 @@
-import CoreConcept from "../components/CoreConcept";
+import CoreConcept from "./CoreConcept";
 import { CORE_CONCEPTS } from "../data";
 import Section from "./Section";
 
