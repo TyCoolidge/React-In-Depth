@@ -1,30 +1,26 @@
-import { useState } from "react";
+export default function GameBoard({ onSelectSquare, board }) {
+	// old reference
+	// function handleSelection(rowIndex, colIndex) {
+	// 	console.log(rowIndex, colIndex);
+	// 	setGameBoard((prevGameBoard) => {
+	// 		const updatedBoard = structuredClone(prevGameBoard); // creates deep copy; otherwise we will have to destructure the two arrays
+	// 		updatedBoard[rowIndex][colIndex] = activePlayerSymbol;
+	// 		return updatedBoard;
+	// 	});
 
-const initialGameBoard = [
-	[null, null, null],
-	[null, null, null],
-	[null, null, null],
-];
-
-export default function GameBoard() {
-	const [gameBoard, setGameBoard] = useState(initialGameBoard);
-
-	function handleSelection(rowIndex, colIndex) {
-		console.log(rowIndex, colIndex, value);
-		setGameBoard((prevGameBoard) => {
-			const updatedBoard = structuredClone(prevGameBoard); // creates deep copy; otherwise we will have to destructure the two arrays
-			updatedBoard[rowIndex][colIndex] = "X";
-			return updatedBoard;
-		});
-	}
+	// 	onSelectSquare();
+	// }
 	return (
 		<ol id="game-board">
-			{gameBoard.map((row, rowIndex) => (
+			{board.map((row, rowIndex) => (
 				<li key={rowIndex}>
 					<ol>
 						{row.map((playerSymbol, colIndex) => (
 							<li key={colIndex}>
-								<button onClick={() => handleSelection(rowIndex, colIndex)}>
+								<button
+									onClick={() => onSelectSquare(rowIndex, colIndex)}
+									disabled={playerSymbol !== null}
+								>
 									{playerSymbol}
 								</button>
 							</li>
