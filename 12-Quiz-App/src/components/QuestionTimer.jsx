@@ -5,6 +5,8 @@ export default function QuestionTimer({ timeout, onTimeout }) {
 
 	useEffect(() => {
 		console.log("timer");
+		// next test, see if timer continues if i select an option before timer is up
+
 		const timer = setTimeout(onTimeout, timeout);
 
 		return () => {
