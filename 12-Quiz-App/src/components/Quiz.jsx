@@ -1,15 +1,24 @@
 import React, { useCallback } from "react";
 import QUESTIONS from "../questions";
 import { useState } from "react";
-import quizComplete from "../assets/quiz-complete.png";
 import QuestionTimer from "./QuestionTimer";
 import Answers from "./Answers";
 import { AnswersContext } from "../store/answers-context";
+import Summary from "./Summary";
 
 export default function Quiz() {
 	const [answerState, setAnswerState] = useState("");
 	const [userAnswers, setUserAnswers] = useState([]);
 
+	let timer = 10000;
+
+	if (answerState === "answered") {
+		timer = 1000;
+	}
+
+	if (answerState === "correct" || answerState === "wrong") {
+		timer = 2000;
+	}
 	const activeQuestionIndex =
 		answerState === "" ? userAnswers.length : userAnswers.length - 1;
 
@@ -42,12 +51,7 @@ export default function Quiz() {
 	);
 
 	if (quizIsComplete) {
-		return (
-			<div id="summary">
-				<img src={quizComplete} />
-				<h2>Quiz Completed!</h2>
-			</div>
-		);
+		return <Summary userAnswers={userAnswers} />;
 	}
 
 	const contextValue = {
@@ -61,9 +65,10 @@ export default function Quiz() {
 		<div id="quiz">
 			<div id="question">
 				<QuestionTimer
-					key={activeQuestionIndex}
-					timeout={10000}
-					onTimeout={handleSkipAnswer}
+					key={timer}
+					timeout={timer}
+					onTimeout={answerState === "" ? handleSkipAnswer : null}
+					mode={answerState}
 				/>
 				<h2>{QUESTIONS[activeQuestionIndex].text}</h2>
 				<AnswersContext.Provider value={contextValue}>
