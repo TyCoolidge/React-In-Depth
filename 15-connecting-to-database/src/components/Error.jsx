@@ -1,3 +1,4 @@
+// renamed component to not conflict with built in error class
 export default function ErrorComponent({ title, message, onConfirm }) {
 	return (
 		<div className="error">
