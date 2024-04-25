@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
 	res.setHeader("Access-Control-Allow-Origin", "*"); // allow all domains
-	res.setHeader("Access-Control-Allow-Methods", "GET, PUT");
+	res.setHeader("Access-Control-Allow-Methods", "GET, PUT, DELETE");
 	res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
 	next();
@@ -39,6 +39,16 @@ app.put("/user-places", async (req, res) => {
 	await fs.writeFile("./data/user-places.json", JSON.stringify(places));
 
 	res.status(200).json({ message: "User places updated!" });
+});
+
+app.delete("/user-places", async (req, res) => {
+	const placeId = req.body.id;
+	const fileContent = await fs.readFile("./data/user-places.json");
+	const placesData = JSON.parse(fileContent);
+	const updatedPlaces = placesData.filter((place) => place.id !== placeId);
+	await fs.writeFile("./data/user-places.json", JSON.stringify(updatedPlaces));
+
+	res.status(200).json({ message: "User place deleted!" });
 });
 
 // 404

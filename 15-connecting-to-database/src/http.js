@@ -8,6 +8,16 @@ export async function fetchAvailablePlaces() {
 	return data.places;
 }
 
+export async function fetchUserPlaces() {
+	const response = await fetch("http://localhost:3000/user-places");
+	const data = await response.json();
+
+	if (!response.ok) {
+		throw new Error("Failed to fetch user places");
+	}
+	return data.places;
+}
+
 export async function updateUserPlaces(places) {
 	const response = await fetch("http://localhost:3000/user-places", {
 		method: "PUT",
@@ -20,6 +30,22 @@ export async function updateUserPlaces(places) {
 
 	if (!response.ok) {
 		throw new Error("Failed to update user places");
+	}
+	return data.message;
+}
+
+export async function deleteUserPlace(id) {
+	const response = await fetch("http://localhost:3000/user-places", {
+		method: "DELETE",
+		body: JSON.stringify({ id }),
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+	const data = await response.json();
+
+	if (!response.ok) {
+		throw new Error("Failed to delete user place");
 	}
 	return data.message;
 }
