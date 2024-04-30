@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback } from "react";
 
 import Places from "./components/Places.jsx";
 import Modal from "./components/Modal.jsx";
@@ -7,16 +7,22 @@ import logoImg from "./assets/logo.png";
 import AvailablePlaces from "./components/AvailablePlaces.jsx";
 import { deleteUserPlace, fetchUserPlaces, updateUserPlaces } from "./http.js";
 import ErrorComponent from "./components/Error.jsx";
+import useFetch from "./hooks/useFetch.js";
 
 function App() {
 	const selectedPlace = useRef();
 
-	const [userPlaces, setUserPlaces] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
+	// const [userPlaces, setUserPlaces] = useState([]);
 	const [errorUpdatingPlaces, setErrorUpdatingPlaces] = useState(null);
 
 	const [modalIsOpen, setModalIsOpen] = useState(false);
+
+	const {
+		isFetching,
+		fetchedData: userPlaces,
+		setFetchedData,
+		error,
+	} = useFetch(fetchUserPlaces, []);
 
 	function handleStartRemovePlace(place) {
 		setModalIsOpen(true);
@@ -28,7 +34,7 @@ function App() {
 	}
 
 	async function handleSelectPlace(selectedPlace) {
-		setUserPlaces((prevPickedPlaces) => {
+		setFetchedData((prevPickedPlaces) => {
 			if (!prevPickedPlaces) {
 				prevPickedPlaces = [];
 			}
@@ -41,7 +47,7 @@ function App() {
 		try {
 			await updateUserPlaces([selectedPlace, ...userPlaces]);
 		} catch (err) {
-			setUserPlaces(userPlaces);
+			setFetchedData(userPlaces);
 			setErrorUpdatingPlaces({
 				message: err.message || "Failed to update places.",
 			});
@@ -50,7 +56,7 @@ function App() {
 
 	const handleRemovePlace = useCallback(
 		async function handleRemovePlace() {
-			setUserPlaces((prevPickedPlaces) =>
+			setFetchedData((prevPickedPlaces) =>
 				prevPickedPlaces.filter(
 					(place) => place.id !== selectedPlace.current.id
 				)
@@ -60,7 +66,7 @@ function App() {
 				await deleteUserPlace(selectedPlace.current.id);
 			} catch (err) {
 				// sets back to previous places before line 50 takes affect
-				setUserPlaces(userPlaces);
+				setFetchedData(userPlaces);
 				setErrorUpdatingPlaces({
 					message: err.message || "Failed to update places.",
 				});
@@ -68,29 +74,12 @@ function App() {
 
 			setModalIsOpen(false);
 		},
-		[userPlaces]
+		[userPlaces, setFetchedData]
 	);
 
 	function handleError() {
 		setErrorUpdatingPlaces(null);
 	}
-
-	useEffect(() => {
-		async function fetchPlaces() {
-			setLoading(true);
-			try {
-				const places = await fetchUserPlaces();
-				if (places?.length) {
-					setUserPlaces(places);
-				}
-			} catch (err) {
-				setError({ message: error.message || "Failed to fetch user places." });
-			}
-			setLoading(false);
-		}
-
-		fetchPlaces();
-	}, []);
 
 	return (
 		<>
@@ -128,7 +117,7 @@ function App() {
 					<Places
 						title="I'd like to visit ..."
 						fallbackText="Select the places you would like to visit below."
-						isLoading={loading}
+						isLoading={isFetching}
 						loadingText="Fetching your places..."
 						places={userPlaces}
 						onSelectPlace={handleStartRemovePlace}

@@ -1,43 +1,33 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import Places from "./Places.jsx";
 import ErrorComponent from "./Error.jsx";
 import { sortPlacesByDistance } from "../loc.js";
 import { fetchAvailablePlaces } from "../http.js";
+import useFetch from "../hooks/useFetch.js";
 
-export default function AvailablePlaces({ onSelectPlace }) {
-	const [availablePlaces, setAvailablePlaces] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
-
-	useEffect(() => {
-		async function getPlaces() {
-			setLoading(true);
-			try {
-				const places = await fetchAvailablePlaces();
-
-				navigator.geolocation.getCurrentPosition(
-					({ coords: { latitude, longitude } }) => {
-						const sortedPlaces = sortPlacesByDistance(
-							places,
-							latitude,
-							longitude
-						);
-						setAvailablePlaces(sortedPlaces);
-						setLoading(false); // need this since function is not async, calling this after try,catch will immediately happen before sorting
-					},
-					(error) => {
-						setAvailablePlaces(places);
-						setLoading(false);
-					}
-				);
-			} catch (error) {
-				setError(error);
-				setLoading(false);
+async function fetchSortedPlaces() {
+	const places = await fetchAvailablePlaces();
+	// returning promise since customer hook awaits fetchFn
+	return new Promise((resolve, reject) => {
+		navigator.geolocation.getCurrentPosition(
+			({ coords: { latitude, longitude } }) => {
+				const sortedPlaces = sortPlacesByDistance(places, latitude, longitude);
+				resolve(sortedPlaces);
 			}
-		}
+		),
+			(error) => {
+				reject(error);
+			};
+	});
+}
 
-		getPlaces();
-	}, []);
+// eslint-disable-next-line react/prop-types
+export default function AvailablePlaces({ onSelectPlace }) {
+	const {
+		isFetching,
+		fetchedData: availablePlaces,
+		error,
+	} = useFetch(fetchSortedPlaces, []);
 
 	if (error) {
 		return (
@@ -51,7 +41,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
 		<Places
 			title="Available Places"
 			places={availablePlaces}
-			isLoading={loading}
+			isLoading={isFetching}
 			loadingText="Fetching place data..."
 			fallbackText="No places available."
 			onSelectPlace={onSelectPlace}
