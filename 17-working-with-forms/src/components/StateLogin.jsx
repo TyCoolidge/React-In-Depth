@@ -8,12 +8,22 @@ export default function StateLogin() {
 		password: "",
 	});
 
+	const [didEdit, setDidEdit] = useState({
+		email: false,
+
+		password: false,
+	});
+
 	// function handleEmailChange(event) {
 	// 	setEnteredEmail(event.target.value);
 	// }
 	// function handlePasswordChange(event) {
 	// 	setEnteredPassword(event.target.value);
 	// }
+	console.log(enteredValue);
+	console.log(didEdit);
+
+	const emailIsInvalid = !enteredValue.email.includes("@") && didEdit.email;
 
 	function handleInputChange(identifier, e) {
 		setEnteredValue((prevValue) => {
@@ -22,9 +32,25 @@ export default function StateLogin() {
 				[identifier]: e.target.value,
 			};
 		});
+		setDidEdit((prevValue) => {
+			return {
+				...prevValue,
+				[identifier]: false,
+			};
+		});
+	}
+
+	function handleInputBlur(identifier, e) {
+		setDidEdit((prevValue) => {
+			return {
+				...prevValue,
+				[identifier]: true,
+			};
+		});
 	}
 
 	function handleSubmit(e) {
+		// should validate on submit even if validating on keystrokes
 		e.preventDefault();
 		console.log({ enteredValue });
 		console.log("Submitted!");
@@ -41,9 +67,15 @@ export default function StateLogin() {
 						id="email"
 						type="email"
 						name="email"
+						onBlur={() => handleInputBlur("email")}
 						onChange={(e) => handleInputChange("email", e)}
 						value={enteredValue.email}
 					/>
+					{emailIsInvalid && (
+						<div className="control-error">
+							<p>Please enter a valid email address.</p>
+						</div>
+					)}
 				</div>
 
 				<div className="control no-margin">
