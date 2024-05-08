@@ -20,6 +20,8 @@ export default function StateLogin() {
 	function handleSubmit(e) {
 		// should validate on submit even if validating on keystrokes
 		e.preventDefault();
+
+		if (emailHasError || passwordHasError) return;
 		console.log("Submitted!");
 	}
 

@@ -72,7 +72,7 @@ export function CartContextProvider({ children }) {
 	}
 
 	const cartContextValue = {
-		items: cart.item,
+		items: cart.items,
 		addItem,
 		removeItem,
 	};
