@@ -1,4 +1,5 @@
 import { createContext, useReducer } from "react";
+import { currencyFormatter } from "../utils/formatting";
 
 // don't need to set, just helps with planning and autocompletion
 const CartContext = createContext({
@@ -71,10 +72,15 @@ export function CartContextProvider({ children }) {
 		});
 	}
 
+	const cartTotal = cart.items.reduce((acc, curr) => {
+		return (acc += +curr.price * curr.quantity);
+	}, 0);
+
 	const cartContextValue = {
 		items: cart.items,
 		addItem,
 		removeItem,
+		cartTotal: currencyFormatter.format(cartTotal),
 	};
 
 	return (
