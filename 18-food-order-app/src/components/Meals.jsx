@@ -5,6 +5,7 @@ import useFetch from "../hooks/useFetch";
 function Meals() {
 	const [meals, setMeals] = useState([]);
 	const { error, sendRequest, loading, data } = useFetch();
+	console.log("🚀 ~ Meals ~ error:", error);
 
 	useEffect(() => {
 		if (!data) {
