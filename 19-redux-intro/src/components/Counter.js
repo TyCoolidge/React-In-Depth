@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import classes from "./Counter.module.css";
-import { counterActions } from "../store";
+import { counterActions } from "../store/counter-store";
 console.log("🚀 ~ counterActions:", counterActions);
 
 const Counter = () => {
@@ -15,7 +15,7 @@ const Counter = () => {
 	};
 
 	const increaseHandler = () => {
-		dispatch(counterActions.increase(4)); //will pass value as the following object; {payload: 4}
+		dispatch(counterActions.increase(5)); //will pass value as the following object; {payload: 4}
 	};
 
 	const decrementHandler = () => {
